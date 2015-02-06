@@ -12,12 +12,25 @@ console.log(db);
 
 var app = express();
 app.use(bodyparser.json());
+
+app.get('/sign_in', function(req, res) {
+	//
+	applescript.execFile('signin.AppleScript', [userId, password],
+	function(err, result) {
+		if (err) {
+			console.log('switch user error: ' + err);
+			return false;
+		}
+
+		// we have successfully logged into a new user's account. now to copy the node equipment to their directory and get them working
+	});
+});
+
+
 app.get('/all_messages', function(req, res) {
 	db.serialize(function() {
 		db.each("SELECT message.text, message.ROWID as message_id, handle.id as handle_name FROM message JOIN handle ON message.handle_id = handle.ROWID WHERE message.service = 'iMessage'", function(err, row) {
-				// console.log(err);
-				// console.log(row);
-				console.log(row.handle_name + " #" + row.message_id + ": " + row.text);
+			console.log(row.handle_name + " #" + row.message_id + ": " + row.text);
 		});
 	});
 
@@ -31,7 +44,7 @@ app.post('/send_message', function(req, res) {
 	var to = req.body.to
 	var message = req.body.message;
 	applescript.execFile('send_message.AppleScript', [to, message],
-function(err, result) {
+	function(err, result) {
 		if (err) {
 			console.log('error');
 			console.log(err);
